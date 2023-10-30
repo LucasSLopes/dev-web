@@ -20,10 +20,12 @@ export class Ativo {
   status: Status;
 
   constructor(ativo?: CreateAtivoDto) {
-    this.CGR = ativo.CGR;
-    this.descricao = ativo.descricao;
-    this.equipamento = ativo.equipamento;
-    this.marca = ativo.marca;
-    this.status = ativo.status;
+    if (ativo) {
+      this.CGR = ativo.CGR;
+      this.descricao = ativo.descricao;
+      this.equipamento = ativo.equipamento;
+      this.marca = ativo.marca;
+      this.status = ativo.status;
+    }
   }
 }
