@@ -20,28 +20,20 @@ export class UsersService {
   async criarUsuario(data: CreateUserDto): Promise<User> {
     const saltOrRounds = 10;
 
-    const verificarMatriculaUsuario = await this.userRepository.findOne({
-      where: { matricula: data.matricula },
-    });
+    const campos = ['matricula', 'cpf', 'email'];
 
-    if (verificarMatriculaUsuario) {
-      throw new NotFoundException('Matricula já cadastrada');
+    for (const campo of campos) {
+      const userExiste = await this.userRepository.findOne({
+        where: { [campo]: data[campo] },
+      });
+      if (userExiste) {
+        throw new NotFoundException(
+          `${campo.charAt(0).toUpperCase() + campo.slice(1)} já cadastrado`,
+        );
+      }
     }
 
-    const verificarCpfUsuario = await this.userRepository.findOne({
-      where: { cpf: data.cpf },
-    });
-    if (verificarCpfUsuario) {
-      throw new NotFoundException('CPF já cadastrado');
-    }
-
-    const verificarEmailUsuario = await this.userRepository.findOne({
-      where: { email: data.email },
-    });
-    if (verificarEmailUsuario) {
-      throw new NotFoundException('Email já cadastrado');
-    }
-    data.senha = await bcrypt.hash(data.senha, saltOrRounds);
+    data.senha = await bcrypt.hash(data.senha, saltOrRounds); //encripitando a senha;
     try {
       const createdUser = new User(data);
       return await this.userRepository.save(createdUser);
@@ -52,9 +44,6 @@ export class UsersService {
 
   async listarUsuarios(): Promise<User[]> {
     const users = await this.userRepository.find();
-    users.forEach((user) => {
-      delete user.senha;
-    });
     return users;
   }
 
@@ -73,7 +62,7 @@ export class UsersService {
     }
 
     //Impedir a atualização nos campos nome, cpf, matricula
-    const camposNaoAtualizaveis = ['nome', 'cpf', 'matricula'];
+    const camposNaoAtualizaveis = ['matricula', 'nome', 'cpf'];
     for (const campo of camposNaoAtualizaveis) {
       if (updateData[campo]) {
         throw new BadRequestException(
@@ -81,13 +70,16 @@ export class UsersService {
         );
       }
     }
-    //Realizar a alteracao para cada atributo no updateData
-    const queryBuilder = this.userRepository.createQueryBuilder().update(User);
+    const updateObject = {};
+    // updateData.senha = await bcrypt.hash(updateData.senha, 10); encripitar a nova senha
     for (const campo in updateData) {
       if (updateData[campo]) {
-        queryBuilder.set({ [campo]: updateData[campo] });
+        updateObject[campo] = updateData[campo];
       }
     }
+    //Realizar a alteracao para cada atributo no updateData
+    const queryBuilder = this.userRepository.createQueryBuilder().update(User);
+    queryBuilder.set(updateObject);
     //Execução da operação no banco de dados
     await queryBuilder.where('matricula = :matricula', { matricula }).execute();
 
