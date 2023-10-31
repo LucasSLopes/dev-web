@@ -4,7 +4,7 @@ import { Ativo } from './ativo.entity';
 
 export const ativoProvider = [
   {
-    provide: 'ATIVO_RP',
+    provide: 'ATIVOS_RP',
     useFactory: (dataSource: DataSource) => dataSource.getRepository(Ativo),
     inject: ['DATA_SOURCE'],
   },

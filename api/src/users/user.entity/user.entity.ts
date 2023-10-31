@@ -13,10 +13,10 @@ export class User {
   @Column({ length: 20, readonly: true })
   cpf: string;
 
-  @Column({ length: 50, readonly: true })
+  @Column({ length: 50 })
   telefone: string;
 
-  @Column({ length: 50, readonly: true })
+  @Column({ length: 50 })
   email: string;
 
   @Column({ type: 'enum', enum: Permissao, default: Permissao.USUARIO })

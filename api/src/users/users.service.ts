@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +18,8 @@ export class UsersService {
   ) {}
 
   async criarUsuario(data: CreateUserDto): Promise<User> {
-    console.log(data);
+    const saltOrRounds = 10;
+
     const verificarMatriculaUsuario = await this.userRepository.findOne({
       where: { matricula: data.matricula },
     });
@@ -39,7 +41,7 @@ export class UsersService {
     if (verificarEmailUsuario) {
       throw new NotFoundException('Email já cadastrado');
     }
-
+    data.senha = await bcrypt.hash(data.senha, saltOrRounds);
     try {
       const createdUser = new User(data);
       return await this.userRepository.save(createdUser);
@@ -58,46 +60,46 @@ export class UsersService {
 
   async getUserByMatricula(matricula: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { matricula } });
-    delete user.senha;
     return user;
   }
 
   async updateUser(
     matricula: string,
     updateData: UpdateUserDto,
-  ): Promise<string> {
+  ): Promise<User> {
     const user = await this.userRepository.findOne({ where: { matricula } });
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    if (updateData.telefone) {
-      user.telefone = updateData.telefone;
+
+    //Impedir a atualização nos campos nome, cpf, matricula
+    const camposNaoAtualizaveis = ['nome', 'cpf', 'matricula'];
+    for (const campo of camposNaoAtualizaveis) {
+      if (updateData[campo]) {
+        throw new BadRequestException(
+          `O campo ${campo} não pode ser atualizado`,
+        );
+      }
     }
-    if (updateData.email) {
-      user.email = updateData.email;
+    //Realizar a alteracao para cada atributo no updateData
+    const queryBuilder = this.userRepository.createQueryBuilder().update(User);
+    for (const campo in updateData) {
+      if (updateData[campo]) {
+        queryBuilder.set({ [campo]: updateData[campo] });
+      }
     }
-    if (updateData.permissao) {
-      user.permissao = updateData.permissao;
-    }
-    if (updateData.senha) {
-      user.senha = updateData.senha;
-    }
-    if (updateData.nome || updateData.cpf || updateData.matricula) {
-      throw new BadRequestException(
-        'Algum dos campos selecionados não permite alteração',
-      );
-    }
-    await this.userRepository.save(user);
-    return user.matricula;
+    //Execução da operação no banco de dados
+    await queryBuilder.where('matricula = :matricula', { matricula }).execute();
+
+    return this.getUserByMatricula(matricula);
   }
 
-  async deleteUser(matricula: string): Promise<string> {
-    const user = await this.userRepository.findOne({ where: { matricula } });
+  async deleteUser(matricula: string): Promise<User> {
+    const user = await this.getUserByMatricula(matricula);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
-
     await this.userRepository.remove(user);
-    return 'Usuário removido com sucesso';
+    return user;
   }
 }

@@ -26,10 +26,10 @@ export class UsersController {
   }
   @Get(':matricula')
   async getUserByMatricula(@Param('matricula') matricula: string) {
-    return this.usersService.getUserByMatricula(matricula);
+    return await this.usersService.getUserByMatricula(matricula);
   }
 
-  @Put(':id')
+  @Put(':matricula')
   async updateUser(
     @Param('matricula') matricula: string,
     @Body() updateData: UpdateUserDto,
@@ -40,11 +40,7 @@ export class UsersController {
   }
 
   @Delete(':matricula')
-  async deleteUser(
-    @Param('matricula') matricula: string,
-  ): Promise<{ message: string }> {
-    console.log(matricula);
-    const message = await this.usersService.deleteUser(matricula);
-    return { message };
+  async deleteUser(@Param('matricula') matricula: string): Promise<User> {
+    return await this.usersService.deleteUser(matricula);
   }
 }

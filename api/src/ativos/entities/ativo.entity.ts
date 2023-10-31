@@ -4,16 +4,16 @@ import { CreateAtivoDto } from '../dto/create-ativo.dto';
 
 @Entity({ name: 'ativos' })
 export class Ativo {
-  @PrimaryColumn({ length: 10 })
+  @PrimaryColumn()
   CGR: string;
 
-  @Column({ length: 100 })
+  @Column()
   equipamento: string;
 
-  @Column({ length: 255 })
+  @Column()
   descricao: string;
 
-  @Column({ length: 50 })
+  @Column()
   marca: string;
 
   @Column({ type: 'enum', enum: Status })
