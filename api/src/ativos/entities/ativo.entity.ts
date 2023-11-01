@@ -7,13 +7,13 @@ export class Ativo {
   @PrimaryColumn({ readonly: true })
   CGR: string;
 
-  @Column()
+  @Column({ length: 50 })
   equipamento: string;
 
-  @Column()
+  @Column({ length: 255 })
   descricao: string;
 
-  @Column()
+  @Column({ length: 50 })
   marca: string;
 
   @Column({ type: 'enum', enum: Status })
