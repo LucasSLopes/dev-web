@@ -4,10 +4,10 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { Ativo } from './entities/ativo.entity';
 import { CreateAtivoDto } from './dto/create-ativo.dto';
 import { UpdateAtivoDto } from './dto/update-ativo.dto';
-import { Ativo } from './entities/ativo.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class AtivosService {
@@ -17,17 +17,16 @@ export class AtivosService {
   ) {}
 
   async criarAtivo(ativo: CreateAtivoDto): Promise<Ativo> {
-    const verificarCGR = await this.ativoRepository.findOne({
-      where: { CGR: ativo.CGR },
-    });
+    const cgrExiste = await this.getAtivoByCGR(ativo.CGR);
 
-    if (verificarCGR) {
-      throw new NotFoundException('CGR já cadastrada');
+    if (cgrExiste) {
+      throw new NotFoundException('CGR já cadastrado');
     }
 
     try {
       const createdAtivo = new Ativo(ativo);
-      return await this.ativoRepository.save(createdAtivo);
+      await this.ativoRepository.save(createdAtivo);
+      return ativo;
     } catch (error) {
       throw new Error('Erro ao criar ativo');
     }
@@ -37,34 +36,46 @@ export class AtivosService {
     return await this.ativoRepository.find();
   }
 
-  // async getAtivoByCGR(CGR: string): Promise<Ativo> {
-  //   const ativo = await this.ativoRepository.findOne({ where: { CGR } });
-  //   return ativo;
-  // }
+  async getAtivoByCGR(CGR: string): Promise<Ativo> {
+    const ativo = await this.ativoRepository.findOne({ where: { CGR } });
+    if (!ativo) {
+      throw new NotFoundException('Ativo não encontrado');
+    }
+    return ativo;
+  }
 
-  // async updateAtivo(cgr: string, updateData: UpdateAtivoDto): Promise<Ativo> {
-  //   const ativo = await this.getAtivoByCGR(cgr);
+  //ATUALIZAR ATIVO
+  async updateAtivo(CGR: string, updateData: UpdateAtivoDto): Promise<Ativo> {
+    if (updateData.CGR) {
+      throw new BadRequestException('Campo CGR não permite alteração');
+    }
 
-  //   if (!ativo) {
-  //     throw new NotFoundException('Ativo não encontrado');
-  //   }
-  //   if (updateData.descricao) {
-  //     ativo.descricao = updateData.descricao;
-  //   }
-  //   if (updateData.equipamento) {
-  //     ativo.equipamento = updateData.equipamento;
-  //   }
-  //   if (updateData.marca) {
-  //     ativo.marca = updateData.marca;
-  //   }
-  //   if (updateData.status) {
-  //     ativo.status = updateData.status;
-  //   }
-  //   if (updateData.CGR) {
-  //     throw new BadRequestException('Campo CGR não permite alteração');
-  //   }
+    const ativo = await this.getAtivoByCGR(CGR);
+    if (!ativo) {
+      throw new NotFoundException('Ativo não encontrado');
+    }
 
-  //   await this.ativoRepository.save(ativo);
-  //   return ativo;
-  // }
+    const updateObject = {};
+    for (const campo in updateData) {
+      if (updateData[campo]) {
+        updateObject[campo] = updateData[campo];
+      }
+    }
+    const queryBuilder = this.ativoRepository
+      .createQueryBuilder()
+      .update(Ativo);
+    queryBuilder.set(updateObject);
+
+    await queryBuilder.where('CGR = :CGR', { CGR }).execute();
+    return this.getAtivoByCGR(ativo.CGR);
+  }
+
+  async deleteAtivo(CGR: string): Promise<Ativo> {
+    const ativo = await this.getAtivoByCGR(CGR);
+    if (!ativo) {
+      throw new NotFoundException('Ativo não encontrado');
+    }
+    await this.ativoRepository.remove(ativo);
+    return ativo;
+  }
 }

@@ -34,9 +34,7 @@ export class UsersController {
     @Param('matricula') matricula: string,
     @Body() updateData: UpdateUserDto,
   ) {
-    const message = await this.usersService.updateUser(matricula, updateData);
-
-    return { message };
+    return await this.usersService.updateUser(matricula, updateData);
   }
 
   @Delete(':matricula')

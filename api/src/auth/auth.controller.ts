@@ -9,7 +9,7 @@ import { LoginDTO } from './dtos/login.dto';
 import { User } from 'src/users/user.entity/user.entity';
 import { AuthService } from './auth.service';
 
-@Controller('auth')
+@Controller('auth/login')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @UsePipes(ValidationPipe)

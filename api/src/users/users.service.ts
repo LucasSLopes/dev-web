@@ -49,6 +49,9 @@ export class UsersService {
 
   async getUserByMatricula(matricula: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { matricula } });
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
     return user;
   }
 
