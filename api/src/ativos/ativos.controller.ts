@@ -12,6 +12,8 @@ import { CreateAtivoDto } from './dto/create-ativo.dto';
 // import { UpdateAtivoDto } from './dto/update-ativo.dto';
 import { Ativo } from './entities/ativo.entity';
 import { UpdateAtivoDto } from './dto/update-ativo.dto';
+import { HasRoles } from 'src/auth/decorators/has-roles.decorator';
+import { Permissao } from 'src/users/enums/permissao.enum';
 
 @Controller('ativos')
 export class AtivosController {
@@ -21,6 +23,7 @@ export class AtivosController {
     return this.ativosService.criarAtivo(createAtivoDto);
   }
   @Get()
+  @HasRoles(Permissao.ADMINISTRADOR)
   async listarAtivos(): Promise<Ativo[]> {
     return this.ativosService.listarAtivos();
   }

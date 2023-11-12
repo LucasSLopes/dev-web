@@ -11,6 +11,8 @@ import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Permissao } from './enums/permissao.enum';
+import { HasRoles } from 'src/auth/decorators/has-roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -21,6 +23,7 @@ export class UsersController {
   }
 
   @Get()
+  @HasRoles(Permissao.ADMINISTRADOR)
   async listarUsuarios(): Promise<User[]> {
     return this.usersService.listarUsuarios();
   }
