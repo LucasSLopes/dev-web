@@ -1,30 +1,44 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  NotFoundException,
-} from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { LoginDTO } from './dtos/login.dto';
-import { User } from 'src/users/user.entity/user.entity';
+import * as bcrypt from 'bcrypt';
+import { User } from 'src/users/entities/user.entity';
+import { UserPayload } from './models/UserPayload';
+import { JwtService } from '@nestjs/jwt';
+import { UserToken } from './models/UserToken';
 @Injectable()
 export class AuthService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  async login(loginDto: LoginDTO): Promise<User> {
-    const senha = loginDto.senha;
-    const user: User = await this.usersService
-      .getUserByMatricula(loginDto.matricula)
-      .catch(() => undefined);
+  async login(user: User): Promise<UserToken> {
+    //Transformar o user em um JWT
 
-    if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+    const payload: UserPayload = {
+      matricula: user.matricula,
+      name: user.nome,
+      permissao: user.permissao,
+    };
+
+    const jwtToken = this.jwtService.sign(payload);
+
+    return {
+      acess_token: jwtToken,
+    };
+  }
+
+  async validateUser(matricula: string, senha: string): Promise<any> {
+    const user = await this.usersService.getUserForValidation(matricula);
+    if (user) {
+      const senhaValida = await bcrypt.compare(senha, user.senha);
+      if (senhaValida) {
+        return {
+          ...user,
+          senha: undefined,
+        };
+      }
     }
-
-    if (await !bcrypt.compare(senha, user.senha)) {
-      throw new UnauthorizedException();
-    }
-
-    return user;
+    return null;
   }
 }

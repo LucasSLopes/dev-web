@@ -4,7 +4,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 
 @Entity({ name: 'usuarios' })
 export class User {
-  @PrimaryColumn({ length: 15, readonly: true })
+  @PrimaryColumn({ length: 10, readonly: true })
   matricula: string;
 
   @Column({ length: 50, readonly: true })
@@ -13,7 +13,7 @@ export class User {
   @Column({ length: 20, readonly: true })
   cpf: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 15 })
   telefone: string;
 
   @Column({ length: 50 })

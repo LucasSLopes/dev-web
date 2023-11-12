@@ -4,7 +4,7 @@ import { CreateAtivoDto } from '../dto/create-ativo.dto';
 
 @Entity({ name: 'ativos' })
 export class Ativo {
-  @PrimaryColumn({ readonly: true })
+  @PrimaryColumn({ length: 10, readonly: true })
   CGR: string;
 
   @Column({ length: 50 })

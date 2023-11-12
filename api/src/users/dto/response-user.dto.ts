@@ -1,29 +1,21 @@
-import { IsNotEmpty, IsEmail, IsEnum, Length } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateUserDto } from './create-user.dto';
+import { IsNotEmpty, IsEmail, IsEnum } from 'class-validator';
 import { Permissao } from '../enums/permissao.enum';
 
-export class CreateUserDto {
+export class ResponseUserDto extends PartialType(CreateUserDto) {
   @IsNotEmpty()
-  @Length(5, 10)
   matricula: string;
 
   @IsNotEmpty()
   nome: string;
 
   @IsNotEmpty()
-  cpf: string;
-
-  @IsNotEmpty()
-  @Length(8, 15)
   telefone: string;
 
   @IsEmail()
-  @Length(10, 50)
   email: string;
 
   @IsEnum(Permissao)
   permissao: Permissao;
-
-  @IsNotEmpty()
-  @Length(8, 255)
-  senha: string;
 }

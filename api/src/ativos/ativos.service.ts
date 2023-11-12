@@ -17,7 +17,8 @@ export class AtivosService {
   ) {}
 
   async criarAtivo(ativo: CreateAtivoDto): Promise<Ativo> {
-    const cgrExiste = await this.getAtivoByCGR(ativo.CGR);
+    const CGR = ativo.CGR;
+    const cgrExiste = await this.ativoRepository.findOne({ where: { CGR } });
 
     if (cgrExiste) {
       throw new NotFoundException('CGR já cadastrado');
@@ -61,6 +62,22 @@ export class AtivosService {
         updateObject[campo] = updateData[campo];
       }
     }
+    const queryBuilder = this.ativoRepository
+      .createQueryBuilder()
+      .update(Ativo);
+    queryBuilder.set(updateObject);
+
+    await queryBuilder.where('CGR = :CGR', { CGR }).execute();
+    return this.getAtivoByCGR(ativo.CGR);
+  }
+
+  async updateAtivoStatus(CGR: string, status: string): Promise<Ativo> {
+    const ativo = await this.getAtivoByCGR(CGR);
+    if (!ativo) {
+      throw new NotFoundException('Ativo não encontrado');
+    }
+    const updateObject = {};
+    updateObject['status'] = status;
     const queryBuilder = this.ativoRepository
       .createQueryBuilder()
       .update(Ativo);

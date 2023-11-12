@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { User } from './user.entity/user.entity';
+import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -17,14 +17,12 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
 
-  async criarUsuario(data: CreateUserDto): Promise<User> {
-    const saltOrRounds = 10;
-
+  async criarUsuario(createdUserDto: CreateUserDto): Promise<User> {
     const campos = ['matricula', 'cpf', 'email'];
-
+    //Verificar se algum dos dados unicos já existe no banco.
     for (const campo of campos) {
       const userExiste = await this.userRepository.findOne({
-        where: { [campo]: data[campo] },
+        where: { [campo]: createdUserDto[campo] },
       });
       if (userExiste) {
         throw new NotFoundException(
@@ -32,11 +30,19 @@ export class UsersService {
         );
       }
     }
-
-    data.senha = await bcrypt.hash(data.senha, saltOrRounds); //encripitando a senha;
+    //Encriptar a senha
+    const data = {
+      ...createdUserDto,
+      senha: await bcrypt.hash(createdUserDto.senha, 10),
+    };
+    //Criar Usuario
     try {
-      const createdUser = new User(data);
-      return await this.userRepository.save(createdUser);
+      const user = new User(data);
+      const createdUser = await this.userRepository.save(user);
+      return {
+        ...createdUser,
+        senha: undefined,
+      };
     } catch (error) {
       throw new Error('Erro ao criar usuário');
     }
@@ -44,6 +50,9 @@ export class UsersService {
 
   async listarUsuarios(): Promise<User[]> {
     const users = await this.userRepository.find();
+    users.forEach((user) => {
+      delete user.senha;
+    });
     return users;
   }
 
@@ -52,9 +61,17 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
+    user.senha = undefined;
     return user;
   }
 
+  async getUserForValidation(matricula: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { matricula } });
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    return user;
+  }
   async updateUser(
     matricula: string,
     updateData: UpdateUserDto,
@@ -74,7 +91,7 @@ export class UsersService {
       }
     }
     const updateObject = {};
-    // updateData.senha = await bcrypt.hash(updateData.senha, 10); encripitar a nova senha
+    updateData.senha = await bcrypt.hash(updateData.senha, 10); //encripitar a nova senha
     for (const campo in updateData) {
       if (updateData[campo]) {
         updateObject[campo] = updateData[campo];

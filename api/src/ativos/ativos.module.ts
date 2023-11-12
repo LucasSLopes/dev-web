@@ -7,5 +7,6 @@ import { ativoProvider } from './entities/ativo.provider';
   imports: [DatabaseModule],
   controllers: [AtivosController],
   providers: [...ativoProvider, AtivosService],
+  exports: [AtivosService],
 })
 export class AtivosModule {}

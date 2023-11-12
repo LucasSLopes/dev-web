@@ -8,7 +8,7 @@ import {
   Param,
 } from '@nestjs/common/';
 import { UsersService } from './users.service';
-import { User } from './user.entity/user.entity';
+import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -27,6 +27,11 @@ export class UsersController {
   @Get(':matricula')
   async getUserByMatricula(@Param('matricula') matricula: string) {
     return await this.usersService.getUserByMatricula(matricula);
+  }
+
+  @Get('validar/:matricula')
+  async getUserForValidation(@Param('matricula') matricula: string) {
+    return await this.usersService.getUserForValidation(matricula);
   }
 
   @Put(':matricula')
