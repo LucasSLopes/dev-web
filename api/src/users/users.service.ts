@@ -9,6 +9,7 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { ResponseUserDto } from './dto/response-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +19,7 @@ export class UsersService {
   ) {}
 
   async criarUsuario(createdUserDto: CreateUserDto): Promise<User> {
-    const campos = ['matricula', 'cpf', 'email'];
+    const campos = ['matricula', 'cpf', 'email', 'telefone'];
     //Verificar se algum dos dados unicos já existe no banco.
     for (const campo of campos) {
       const userExiste = await this.userRepository.findOne({
@@ -70,6 +71,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
+
     return user;
   }
   async updateUser(
@@ -106,12 +108,12 @@ export class UsersService {
     return this.getUserByMatricula(matricula);
   }
 
-  async deleteUser(matricula: string): Promise<User> {
+  async deleteUser(matricula: string): Promise<ResponseUserDto> {
     const user = await this.getUserByMatricula(matricula);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
     await this.userRepository.remove(user);
-    return user;
+    return new ResponseUserDto(user);
   }
 }

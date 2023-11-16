@@ -16,6 +16,7 @@ export class AuthService {
     //Transformar o user em um JWT
 
     const payload: UserPayload = {
+      id: user.id,
       matricula: user.matricula,
       name: user.nome,
       permissao: user.permissao,
@@ -29,6 +30,7 @@ export class AuthService {
   }
 
   async validateUser(matricula: string, senha: string): Promise<any> {
+    console.log(matricula);
     const user = await this.usersService.getUserForValidation(matricula);
     if (user) {
       const senhaValida = await bcrypt.compare(senha, user.senha);

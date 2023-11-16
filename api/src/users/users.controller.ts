@@ -13,6 +13,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Permissao } from './enums/permissao.enum';
 import { HasRoles } from 'src/auth/decorators/has-roles.decorator';
+import { ResponseUserDto } from './dto/response-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -46,7 +47,9 @@ export class UsersController {
   }
 
   @Delete(':matricula')
-  async deleteUser(@Param('matricula') matricula: string): Promise<User> {
+  async deleteUser(
+    @Param('matricula') matricula: string,
+  ): Promise<ResponseUserDto> {
     return await this.usersService.deleteUser(matricula);
   }
 }

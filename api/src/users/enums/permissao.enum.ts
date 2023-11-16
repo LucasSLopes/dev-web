@@ -1,6 +1,5 @@
 enum Permissao {
   ADMINISTRADOR = 'ADMINISTRADOR',
-  GESTOR = 'GESTOR',
   USUARIO = 'USUARIO',
 }
 

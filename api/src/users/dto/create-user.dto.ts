@@ -14,6 +14,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @Length(8, 15)
+  @IsNotEmpty()
   telefone: string;
 
   @IsEmail()
