@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Ativo } from './entities/ativo.entity';
 import { CreateAtivoDto } from './dto/create-ativo.dto';
 import { UpdateAtivoDto } from './dto/update-ativo.dto';
+import { UpdateStatusAtivoDto } from './dto/update-status-ativo.dto';
 
 @Injectable()
 export class AtivosService {
@@ -16,8 +17,8 @@ export class AtivosService {
     private ativoRepository: Repository<Ativo>,
   ) {}
 
-  async criarAtivo(ativo: CreateAtivoDto): Promise<Ativo> {
-    const CGR = ativo.CGR;
+  async criarAtivo(createAtivoDto: CreateAtivoDto): Promise<Ativo> {
+    const CGR = createAtivoDto.CGR;
     const cgrExiste = await this.ativoRepository.findOne({ where: { CGR } });
 
     if (cgrExiste) {
@@ -25,9 +26,9 @@ export class AtivosService {
     }
 
     try {
-      const createdAtivo = new Ativo(ativo);
-      await this.ativoRepository.save(createdAtivo);
-      return ativo;
+      const ativo = new Ativo(createAtivoDto);
+      const createdAtivo = await this.ativoRepository.save(ativo);
+      return createdAtivo;
     } catch (error) {
       throw new Error('Erro ao criar ativo');
     }
@@ -71,20 +72,14 @@ export class AtivosService {
     return this.getAtivoByCGR(ativo.CGR);
   }
 
-  async updateAtivoStatus(CGR: string, status: string): Promise<Ativo> {
-    const ativo = await this.getAtivoByCGR(CGR);
+  async updateAtivoStatus(data: UpdateStatusAtivoDto): Promise<Ativo> {
+    const ativo = await this.getAtivoByCGR(data.CGR);
     if (!ativo) {
       throw new NotFoundException('Ativo não encontrado');
     }
-    const updateObject = {};
-    updateObject['status'] = status;
-    const queryBuilder = this.ativoRepository
-      .createQueryBuilder()
-      .update(Ativo);
-    queryBuilder.set(updateObject);
 
-    await queryBuilder.where('CGR = :CGR', { CGR }).execute();
-    return this.getAtivoByCGR(ativo.CGR);
+    ativo.status = data.status;
+    return await this.ativoRepository.save(ativo);
   }
 
   async deleteAtivo(CGR: string): Promise<Ativo> {

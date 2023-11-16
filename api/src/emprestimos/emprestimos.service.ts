@@ -51,10 +51,10 @@ export class EmprestimosService {
           );
         }
         try {
-          await this.ativosService.updateAtivoStatus(
-            emprestimo.ativo,
-            Status.ALOCADO,
-          );
+          await this.ativosService.updateAtivoStatus({
+            CGR: emprestimo.ativo,
+            status: Status.ALOCADO,
+          });
         } catch (error) {
           new NotFoundException(`Erro ao fechar solicitacao: ${error.message}`);
         }

@@ -1,9 +1,9 @@
-import { IsString, IsEnum, Length } from 'class-validator';
+import { IsString, IsEnum, Length, IsNumberString } from 'class-validator';
 import { Status } from './../enums/status.enum'; // Certifique-se de importar seu enum Status aqui.
 
 export class CreateAtivoDto {
-  @IsString()
-  @Length(5, 10)
+  @IsNumberString()
+  @Length(6, 6)
   CGR: string;
 
   @IsString()

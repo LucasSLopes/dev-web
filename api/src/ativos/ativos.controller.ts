@@ -5,6 +5,7 @@ import {
   Body,
   Param,
   Put,
+  Patch,
   Delete,
 } from '@nestjs/common';
 import { AtivosService } from './ativos.service';
@@ -14,6 +15,7 @@ import { Ativo } from './entities/ativo.entity';
 import { UpdateAtivoDto } from './dto/update-ativo.dto';
 import { HasRoles } from 'src/auth/decorators/has-roles.decorator';
 import { Permissao } from 'src/users/enums/permissao.enum';
+import { UpdateStatusAtivoDto } from './dto/update-status-ativo.dto';
 
 @Controller('ativos')
 export class AtivosController {
@@ -38,6 +40,12 @@ export class AtivosController {
   ) {
     return await this.ativosService.updateAtivo(CGR, updateData);
   }
+
+  @Patch()
+  async updateStatus(@Body() data: UpdateStatusAtivoDto) {
+    return await this.ativosService.updateAtivoStatus(data);
+  }
+
   @Delete(':CGR')
   async deleteAtivo(@Param('CGR') CGR: string): Promise<Ativo> {
     return await this.ativosService.deleteAtivo(CGR);
