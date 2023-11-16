@@ -22,10 +22,14 @@ export class EmprestimosService {
   ) {}
 
   async criarEmprestimo(emprestimo: CreateEmprestimoDto): Promise<Emprestimo> {
-    const ativo = await this.ativosService.getAtivoById(emprestimo.ativo);
-    const user = await this.usersService.getUserById(emprestimo.usuario);
-    //Verificar se uma solicitação existe para o ativo
-    // const solicitacaoExiste = await this.solicitacoesService.getSolicitacaoPendenteById()
+    const ativo = await this.ativosService.getAtivoById(emprestimo.ativo); //verificar se o ativo existe
+    const user = await this.usersService.getUserById(emprestimo.usuario); //verificar se o usuario existe
+    const solicitacaoExiste =
+      await this.solicitacoesService.getSolicitacaoPendenteById(
+        emprestimo.solicitacao,
+      );
+
+    //Verificar se o ativo já possui um emprestimo ativo
     const emprestimoExistente = await this.emprestimoRepository.findOne({
       where: { ativo: emprestimo.ativo },
     });
@@ -36,7 +40,8 @@ export class EmprestimosService {
     ) {
       throw new NotFoundException('Este ativo já possui um empréstimo ativo');
     }
-    if (ativo && user) {
+
+    if (ativo && user && solicitacaoExiste) {
       try {
         const createdEmprestimo = new Emprestimo(emprestimo);
         const emprestimoCriado =

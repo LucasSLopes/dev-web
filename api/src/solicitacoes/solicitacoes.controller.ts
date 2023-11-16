@@ -20,12 +20,11 @@ export class SolicitacoesController {
   async getSolicitacoesPendentes(): Promise<Solicitacao[]> {
     return this.solicitacaoService.getSolicitacoesPendentes();
   }
-
-  @Get('/pendentes/:id')
-  async getSolicitacaoPendenteById(
+  @Get('/usuario/:id')
+  async getSolicitacoesByUsuario(
     @Param('id') id: number,
-  ): Promise<Solicitacao> {
-    return this.solicitacaoService.getSolicitacaoPendenteById(id);
+  ): Promise<Solicitacao[]> {
+    return this.solicitacaoService.getSolicitacoesByUsuario(id);
   }
 
   @Get('/fechados')

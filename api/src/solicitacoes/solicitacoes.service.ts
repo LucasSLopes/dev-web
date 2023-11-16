@@ -2,10 +2,10 @@ import { Injectable, Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Solicitacao } from './entities/solicitacao.entity';
 import { CreateSolicitacaoDto } from './dto/create-solicitacao.dto';
-
 import { UsersService } from 'src/users/users.service';
 import { AtivosService } from 'src/ativos/ativos.service';
 import { StatusSolicitacao } from './enum/statusSolicitacao.enum';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class SolicitacoesService {
@@ -23,10 +23,16 @@ export class SolicitacoesService {
   async criarSolicitacao(
     solicitacao: CreateSolicitacaoDto,
   ): Promise<Solicitacao> {
-    const ativo = await this.ativosService.getAtivoByCGR(solicitacao.ativo);
-    const user = await this.usersService.getUserByMatricula(
-      solicitacao.solicitante,
+    const ativo = await this.ativosService.getAtivoById(solicitacao.ativo);
+    const user = await this.usersService.getUserById(solicitacao.usuario);
+
+    const solicitacaoExistente = await this.getSolicitacaoExistente(
+      solicitacao.ativo,
+      solicitacao.usuario,
     );
+    if (solicitacaoExistente) {
+      throw new BadRequestException('Solicitação já existente para este item');
+    }
 
     if (ativo && user) {
       try {
@@ -58,6 +64,21 @@ export class SolicitacoesService {
       );
     }
   }
+  async getSolicitacaoExistente(ativo: number, usuario: number) {
+    try {
+      return await this.solicitacaoRepository.findOne({
+        where: {
+          ativo,
+          usuario,
+          statusSolicitacao: StatusSolicitacao.PENDENTE,
+        },
+      });
+    } catch (error) {
+      throw new Error(
+        `Erro ao buscar solicitacao pendente pelo usuario: ${error.message}`,
+      );
+    }
+  }
 
   async getSolicitacaoPendenteById(id: number): Promise<Solicitacao> {
     try {
@@ -81,11 +102,10 @@ export class SolicitacoesService {
     }
   }
 
-  async getSolicitacoesByUsuario(usuario: string): Promise<Solicitacao[]> {
-    console.log(usuario);
+  async getSolicitacoesByUsuario(usuario: number): Promise<Solicitacao[]> {
     try {
       return await this.solicitacaoRepository.find({
-        where: { solicitante: usuario },
+        where: { usuario: usuario },
       });
     } catch (error) {
       throw new Error(
