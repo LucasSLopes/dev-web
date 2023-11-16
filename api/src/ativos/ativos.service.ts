@@ -38,6 +38,14 @@ export class AtivosService {
     return await this.ativoRepository.find();
   }
 
+  async getAtivoById(id: number): Promise<Ativo> {
+    const ativo = await this.ativoRepository.findOne({ where: { id } });
+    if (!ativo) {
+      throw new NotFoundException('Ativo não encontrado');
+    }
+    return ativo;
+  }
+
   async getAtivoByCGR(CGR: string): Promise<Ativo> {
     const ativo = await this.ativoRepository.findOne({ where: { CGR } });
     if (!ativo) {

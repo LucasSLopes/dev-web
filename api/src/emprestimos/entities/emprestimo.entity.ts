@@ -4,14 +4,17 @@ import { StatusEmprestimo } from '../enum/statusEmprestimo.enum';
 
 @Entity({ name: 'emprestimos' })
 export class Emprestimo {
-  @PrimaryGeneratedColumn('increment')
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 10, readonly: true })
-  ativo: string;
+  @Column({ readonly: true, nullable: false })
+  ativo: number;
 
-  @Column({ length: 10, readonly: true })
-  solicitante: string;
+  @Column({ readonly: true, nullable: false })
+  usuario: number;
+
+  @Column({ readonly: true, nullable: false, unique: true })
+  solicitacao: number;
 
   @Column({
     type: 'timestamp',
@@ -33,8 +36,9 @@ export class Emprestimo {
 
   constructor(emprestimo?: CreateEmprestimoDto) {
     if (emprestimo) {
+      this.solicitacao = emprestimo.solicitacao;
       this.ativo = emprestimo.ativo;
-      this.solicitante = emprestimo.solicitante;
+      this.usuario = emprestimo.usuario;
     }
   }
 }

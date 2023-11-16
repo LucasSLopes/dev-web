@@ -22,10 +22,8 @@ export class EmprestimosService {
   ) {}
 
   async criarEmprestimo(emprestimo: CreateEmprestimoDto): Promise<Emprestimo> {
-    const ativo = await this.ativosService.getAtivoByCGR(emprestimo.ativo);
-    const user = await this.usersService.getUserByMatricula(
-      emprestimo.solicitante,
-    );
+    const ativo = await this.ativosService.getAtivoById(emprestimo.ativo);
+    const user = await this.usersService.getUserById(emprestimo.usuario);
     //Verificar se uma solicitação existe para o ativo
     // const solicitacaoExiste = await this.solicitacoesService.getSolicitacaoPendenteById()
     const emprestimoExistente = await this.emprestimoRepository.findOne({
@@ -52,7 +50,7 @@ export class EmprestimosService {
         }
         try {
           await this.ativosService.updateAtivoStatus({
-            CGR: emprestimo.ativo,
+            id: emprestimo.ativo,
             status: Status.ALOCADO,
           });
         } catch (error) {
@@ -95,7 +93,7 @@ export class EmprestimosService {
     }
   }
 
-  async verificarEmprestimos(ativo: string): Promise<Emprestimo[]> {
+  async verificarEmprestimos(ativo: number): Promise<Emprestimo[]> {
     try {
       return await this.emprestimoRepository.find({
         where: { ativo: ativo },
@@ -107,12 +105,10 @@ export class EmprestimosService {
     }
   }
 
-  async verificarEmprestimosByUsuario(
-    matricula: string,
-  ): Promise<Emprestimo[]> {
+  async verificarEmprestimosByUsuario(id: number): Promise<Emprestimo[]> {
     try {
       return await this.emprestimoRepository.find({
-        where: { solicitante: matricula },
+        where: { usuario: id },
       });
     } catch (error) {
       throw new Error(`Erro ao buscar emprestimos pendentes: ${error.message}`);

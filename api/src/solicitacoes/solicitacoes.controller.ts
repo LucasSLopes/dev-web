@@ -32,13 +32,6 @@ export class SolicitacoesController {
   async getSolicitacoesFechadas(): Promise<Solicitacao[]> {
     return this.solicitacaoService.getSolicitacoesFechadas();
   }
-  @Get(':matricula')
-  async getSolicitacoesByUsuario(
-    @Param('matricula') matricula: string,
-  ): Promise<Solicitacao[]> {
-    return this.solicitacaoService.getSolicitacoesByUsuario(matricula);
-  }
-
   @Put(':id')
   async fecharSolicitacao(@Param('id') id: number): Promise<Solicitacao> {
     return this.solicitacaoService.fecharSolicitacao(id);

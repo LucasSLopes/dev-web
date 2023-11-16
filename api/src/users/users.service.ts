@@ -57,8 +57,8 @@ export class UsersService {
     return users;
   }
 
-  async getUserByMatricula(matricula: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { matricula } });
+  async getUserById(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
@@ -105,11 +105,11 @@ export class UsersService {
     //Execução da operação no banco de dados
     await queryBuilder.where('matricula = :matricula', { matricula }).execute();
 
-    return this.getUserByMatricula(matricula);
+    return this.getUserById(1);
   }
 
-  async deleteUser(matricula: string): Promise<ResponseUserDto> {
-    const user = await this.getUserByMatricula(matricula);
+  async deleteUser(id: number): Promise<ResponseUserDto> {
+    const user = await this.getUserById(id);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }

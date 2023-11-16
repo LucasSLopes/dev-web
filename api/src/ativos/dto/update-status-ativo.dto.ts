@@ -4,8 +4,7 @@ import { CreateAtivoDto } from './create-ativo.dto';
 import { Status } from '../enums/status.enum';
 
 export class UpdateStatusAtivoDto extends PartialType(CreateAtivoDto) {
-  CGR: string;
-
+  id: number;
   @IsEnum(Status)
   status: Status;
 }

@@ -25,12 +25,12 @@ export class EmprestimosController {
   }
 
   @Get(':ativo')
-  async verificarEmprestimosExistente(@Param('ativo') ativo: string) {
+  async verificarEmprestimosExistente(@Param('ativo') ativo: number) {
     return this.emprestimosService.verificarEmprestimos(ativo);
   }
   @Get('/usuario/:matricula')
-  async verificarEmprestimosByUsuario(@Param('matricula') matricula: string) {
-    return this.emprestimosService.verificarEmprestimosByUsuario(matricula);
+  async verificarEmprestimosByUsuario(@Param('id') id: number) {
+    return this.emprestimosService.verificarEmprestimosByUsuario(id);
   }
 
   @Patch(':id')

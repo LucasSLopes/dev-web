@@ -28,9 +28,9 @@ export class UsersController {
   async listarUsuarios(): Promise<User[]> {
     return this.usersService.listarUsuarios();
   }
-  @Get(':matricula')
-  async getUserByMatricula(@Param('matricula') matricula: string) {
-    return await this.usersService.getUserByMatricula(matricula);
+  @Get(':id')
+  async getUserByMatricula(@Param('id') id: number) {
+    return await this.usersService.getUserById(id);
   }
 
   @Get('validar/:matricula')
@@ -46,10 +46,8 @@ export class UsersController {
     return await this.usersService.updateUser(matricula, updateData);
   }
 
-  @Delete(':matricula')
-  async deleteUser(
-    @Param('matricula') matricula: string,
-  ): Promise<ResponseUserDto> {
-    return await this.usersService.deleteUser(matricula);
+  @Delete(':id')
+  async deleteUser(@Param('id') id: number): Promise<ResponseUserDto> {
+    return await this.usersService.deleteUser(id);
   }
 }

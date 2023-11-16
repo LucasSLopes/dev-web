@@ -1,12 +1,10 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 export class CreateSolicitacaoDto {
-  @IsString()
   @IsNotEmpty()
-  ativo: string;
+  ativo: number;
 
-  @IsString()
   @IsNotEmpty()
-  solicitante: string;
+  usuario: number;
 
   @IsString()
   @IsNotEmpty()

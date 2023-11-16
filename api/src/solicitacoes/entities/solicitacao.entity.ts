@@ -1,18 +1,18 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { StatusSolicitacao } from '../enum/statusSolicitacao.enum';
 import { CreateSolicitacaoDto } from '../dto/create-solicitacao.dto';
 
 @Entity({ name: 'solicitacoes' })
-@Unique(['ativo', 'solicitante', 'dataCriacao'])
 export class Solicitacao {
-  @PrimaryGeneratedColumn('increment')
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 10, readonly: true })
-  ativo: string;
+  @Column({ readonly: true })
+  ativo: number;
 
-  @Column({ length: 10, readonly: true })
-  solicitante: string;
+  @Column({ readonly: true })
+  usuario: number;
+
   @Column({ length: 255 })
   descricao: string;
 
@@ -23,7 +23,7 @@ export class Solicitacao {
   })
   dataCriacao: Date;
 
-  @Column({ type: 'timestamp', nullable: true }) // Adicione este campo de data de devolução
+  @Column({ type: 'timestamp', nullable: true })
   dataDevolucao: Date;
 
   @Column({
@@ -37,7 +37,7 @@ export class Solicitacao {
   constructor(solicitacao?: CreateSolicitacaoDto) {
     if (solicitacao) {
       this.ativo = solicitacao.ativo;
-      this.solicitante = solicitacao.solicitante;
+      this.usuario = solicitacao.usuario;
       this.descricao = solicitacao.descricao;
     }
   }
