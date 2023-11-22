@@ -22,13 +22,12 @@ const nextAuthOptions: NextAuthOptions = {
             senha: credentials?.senha,
           }),
         });
-        console.log(credentials?.matricula, credentials?.senha);
         const user = await response.json();
-
-        console.log(user);
+        
+        const decodedUser = jwt.decode(user.acess_token);
 
         if (user && response.ok) {
-          console.log(extractUserFromToken(user.acess_token));
+          console.log(user)
           return user;
         }
 
@@ -41,24 +40,6 @@ const nextAuthOptions: NextAuthOptions = {
   },
 };
 
-const token = "potato";
-export const extractUserFromToken = (
-  token: string
-): { [key: string]: any } | null => {
-  try {
-    const decodedToken = jwt.decode(token);
-
-    if (decodedToken) {
-      // Se desejar, você pode fazer validações adicionais aqui
-      return decodedToken as { [key: string]: any };
-    }
-
-    return null;
-  } catch (error) {
-    console.error("Erro ao decodificar o token:", error);
-    return null;
-  }
-};
 
 const handler = NextAuth(nextAuthOptions);
 export { handler as GET, handler as POST, nextAuthOptions };
