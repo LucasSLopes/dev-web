@@ -28,6 +28,12 @@ export class UsersController {
   async listarUsuarios(): Promise<User[]> {
     return this.usersService.listarUsuarios();
   }
+
+  @Get('count')
+  async countUsers(): Promise<number> {
+    return this.usersService.getCountUsers();
+  }
+
   @Get(':id')
   async getUserByMatricula(@Param('id') id: number) {
     return await this.usersService.getUserById(id);

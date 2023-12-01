@@ -1,33 +1,31 @@
-'use client'
-import { signIn } from "next-auth/react";
+"use client";
+import { getServerSession } from "next-auth";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { SyntheticEvent, useState } from "react";
-
+import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/route";
 
 import { useFormState } from "react-dom";
 const LoginForm = () => {
-  const [matricula, setMatricula] = useState<string>('')
-  const [senha, setSenha] = useState<string>('')
+  const [matricula, setMatricula] = useState<string>("");
+  const [senha, setSenha] = useState<string>("");
 
-  const router = useRouter()
+  const router = useRouter();
 
   async function handleSubmit(event: SyntheticEvent) {
-    event.preventDefault()
+    event.preventDefault();
 
-    const result = await signIn('credentials', {
+    const result = await signIn("credentials", {
       matricula,
       senha,
-      redirect: false
-    })
-
-    
+      redirect: false,
+    });
 
     if (result?.error) {
-      console.log(result)
-      return
+      return;
     }
-    console.log(result);
-    router.replace('/admin')
+
+    router.replace("/dashboard");
   }
 
   return (
@@ -35,19 +33,19 @@ const LoginForm = () => {
       <h1 className="text-3xl mb-6">Login</h1>
 
       <form className="w-[400px] flex flex-col gap-6" onSubmit={handleSubmit}>
-        <input 
+        <input
           className="h-12 rounded-md p-2 bg-transparent border border-gray-300"
-          type="text" 
-          name="matricula" 
-          placeholder="Digite sua matricula" 
+          type="text"
+          name="matricula"
+          placeholder="Digite sua matricula"
           onChange={(e) => setMatricula(e.target.value)}
         />
 
-        <input 
+        <input
           className="h-12 rounded-md p-2 bg-transparent border border-gray-300"
-          type="password" 
-          name="senha" 
-          placeholder="Digite sua senha" 
+          type="password"
+          name="senha"
+          placeholder="Digite sua senha"
           onChange={(e) => setSenha(e.target.value)}
         />
 

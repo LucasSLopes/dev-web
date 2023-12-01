@@ -20,7 +20,6 @@ export class UsersService {
 
   async criarUsuario(createdUserDto: CreateUserDto): Promise<User> {
     const campos = ['matricula', 'cpf', 'email', 'telefone'];
-    //Verificar se algum dos dados unicos já existe no banco.
     for (const campo of campos) {
       const userExiste = await this.userRepository.findOne({
         where: { [campo]: createdUserDto[campo] },
@@ -115,5 +114,13 @@ export class UsersService {
     }
     await this.userRepository.remove(user);
     return new ResponseUserDto(user);
+  }
+
+  async getCountUsers(): Promise<number> {
+    try {
+      return await this.userRepository.count();
+    } catch (error) {
+      throw new Error(`Erro ao contar usuarios: ${error.message}`);
+    }
   }
 }

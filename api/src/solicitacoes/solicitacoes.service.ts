@@ -53,6 +53,14 @@ export class SolicitacoesService {
     }
   }
 
+  async count(): Promise<number> {
+    try {
+      return await this.solicitacaoRepository.count();
+    } catch (error) {
+      throw new Error(`Erro ao contar solicitacoes: ${error.message}`);
+    }
+  }
+
   async getSolicitacoesPendentes(): Promise<Solicitacao[]> {
     try {
       return await this.solicitacaoRepository.find({

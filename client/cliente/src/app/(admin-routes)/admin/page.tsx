@@ -1,5 +1,4 @@
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/route"
-// import ButtonLogout from "@/components/ButtonLogout"
 import { getServerSession } from "next-auth"
 
 

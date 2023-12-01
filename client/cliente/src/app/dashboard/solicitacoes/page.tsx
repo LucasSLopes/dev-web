@@ -1,9 +1,12 @@
+import {Teste} from './comp';
 const Solicitacoes = () => {
+
   return (
-    <div>
-      <h1>Solicitacoes</h1>
-    </div>
-  );
+    <>
+      <Teste />
+    </>
+  )
+    
 }
 
 export default Solicitacoes;

@@ -54,6 +54,14 @@ export class AtivosService {
     return ativo;
   }
 
+  async countAtivo(): Promise<number> {
+    try {
+      return await this.ativoRepository.count();
+    } catch (error) {
+      throw new Error(`Erro ao contar ativos: ${error.message}`);
+    }
+  }
+
   //ATUALIZAR ATIVO
   async updateAtivo(CGR: string, updateData: UpdateAtivoDto): Promise<Ativo> {
     if (updateData.CGR) {

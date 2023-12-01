@@ -1,5 +1,5 @@
 import next from "next";
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, User } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import jwt from "jsonwebtoken";
@@ -23,11 +23,7 @@ const nextAuthOptions: NextAuthOptions = {
           }),
         });
         const user = await response.json();
-        
-        const decodedUser = jwt.decode(user.acess_token);
-
         if (user && response.ok) {
-          console.log(user)
           return user;
         }
 
@@ -38,8 +34,21 @@ const nextAuthOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
   },
-};
+  callbacks: {
+    async jwt ({ token, user}) {
+      if (user) {
+        token.user = user;
+      }
 
+      return token;
+    },
+
+    async session ({ session, token }) {
+      session = token.user as any;
+      return session;
+    }
+  }
+};
 
 const handler = NextAuth(nextAuthOptions);
 export { handler as GET, handler as POST, nextAuthOptions };

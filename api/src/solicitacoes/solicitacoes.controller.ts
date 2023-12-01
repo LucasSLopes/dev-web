@@ -31,6 +31,12 @@ export class SolicitacoesController {
   async getSolicitacoesFechadas(): Promise<Solicitacao[]> {
     return this.solicitacaoService.getSolicitacoesFechadas();
   }
+
+  @Get('/count')
+  async getCountSolicitacoes(): Promise<number> {
+    return this.solicitacaoService.count();
+  }
+
   @Put(':id')
   async fecharSolicitacao(@Param('id') id: number): Promise<Solicitacao> {
     return this.solicitacaoService.fecharSolicitacao(id);

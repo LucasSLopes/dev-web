@@ -9,39 +9,13 @@ import {
 } from "react-icons/md";
 import { IoDesktop } from "react-icons/io5";
 import { FaUserCircle, FaHandsHelping } from "react-icons/fa";
-
-
 import { title } from 'process';
 import styles from './sidebar.module.css';
 
+import jwt from "jsonwebtoken";
+import nextAuth, { getServerSession } from "next-auth";
+import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// interface MenuItem {
-//   title: string;
-//   path: string;
-//   icon: ReactNode;
-// }
-// interface MenuCategory {
-//   title: string;
-//   list: MenuItem[];
-// }
-// const menuItem: MenuCategory[] = [
-//   {
-//     title: 'Pages',
-//     list: [
-//       {
-//         title: 'Dashboard',
-//         path: '/dashboard',
-//         icon: <MdDashboard />,
-//       },
-//       {
-//         title: 'Usuarios',
-//         path: '/usuarios',
-//         icon: <MdSupervisedUserCircle  />,
-//       },
-      
-//     ],
-//   }
-// ]
 const menuItems = [
   {
     title: "",
@@ -77,7 +51,13 @@ const menuItems = [
 
 
 const Sidebar = async () => {
+
+const session = await getServerSession(nextAuthOptions);
+const decoded = jwt.decode(session.token);
+
   return (
+     
+
     <div className={styles.container}>
       <div className={styles.user}>
         <Image
@@ -88,8 +68,8 @@ const Sidebar = async () => {
           height="80"
         />
         <div className={styles.userDetail}>
-          <span className={styles.username}>Lucas Lopes</span>
-          <span className={styles.userTitle}>Administrador</span>
+          <span className={styles.username}>{decoded.name}</span>
+          <span className={styles.userTitle}>{decoded.permissao}</span>
         </div>
       </div>
       <ul className={styles.list}>

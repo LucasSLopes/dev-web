@@ -29,6 +29,12 @@ export class AtivosController {
   async listarAtivos(): Promise<Ativo[]> {
     return this.ativosService.listarAtivos();
   }
+
+  @Get('count')
+  async getCountAtivos(): Promise<number> {
+    return this.ativosService.countAtivo();
+  }
+
   @Get(':id')
   async getAtivoByCGR(@Param('CGR') CGR: string): Promise<Ativo> {
     return await this.ativosService.getAtivoByCGR(CGR);

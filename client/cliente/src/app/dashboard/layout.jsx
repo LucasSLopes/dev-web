@@ -1,7 +1,6 @@
-import { ReactNode } from 'react';
-import { LayoutProps } from '../../../.next/types/app/layout';
 import Sidebar from "../ui/dashboard/sidebar/sidebar.";
 import Navbar from "../ui/dashboard/navbar/navbar";
+import Footer from "../ui/dashboard/footer/footer";
 
 import styles from '@/app/ui/dashboard/dashboard.module.css';
 
@@ -10,7 +9,7 @@ import styles from '@/app/ui/dashboard/dashboard.module.css';
 
 
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children }) => {
   return (
     <div className={styles.container}>
       <div className={styles.menu}>
@@ -20,6 +19,9 @@ const Layout = ({ children }: LayoutProps) => {
         <Navbar />
         {children}
       </div>
+      <div className={styles.footer}>
+          <Footer />
+        </div>
     </div>
   );
 };

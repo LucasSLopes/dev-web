@@ -1,0 +1,15 @@
+.container {
+  display: inline;
+  margin-top: 30px;
+  color: var(--textSoft);
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 50px;
+}
+
+.text {
+  font-size: 18px;
+}
