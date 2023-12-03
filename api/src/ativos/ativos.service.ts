@@ -98,8 +98,8 @@ export class AtivosService {
     return await this.ativoRepository.save(ativo);
   }
 
-  async deleteAtivo(CGR: string): Promise<Ativo> {
-    const ativo = await this.getAtivoByCGR(CGR);
+  async deleteAtivo(id: number): Promise<Ativo> {
+    const ativo = await this.getAtivoById(id);
     if (!ativo) {
       throw new NotFoundException('Ativo não encontrado');
     }

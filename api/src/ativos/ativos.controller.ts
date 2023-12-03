@@ -36,8 +36,8 @@ export class AtivosController {
   }
 
   @Get(':id')
-  async getAtivoByCGR(@Param('CGR') CGR: string): Promise<Ativo> {
-    return await this.ativosService.getAtivoByCGR(CGR);
+  async getAtivoById(@Param('id') id: number): Promise<Ativo> {
+    return await this.ativosService.getAtivoById(id);
   }
   @Put(':CGR')
   async updateAtivo(
@@ -52,8 +52,8 @@ export class AtivosController {
     return await this.ativosService.updateAtivoStatus(data);
   }
 
-  @Delete(':CGR')
-  async deleteAtivo(@Param('CGR') CGR: string): Promise<Ativo> {
-    return await this.ativosService.deleteAtivo(CGR);
+  @Delete(':id')
+  async deleteAtivo(@Param('id') id: number): Promise<Ativo> {
+    return await this.ativosService.deleteAtivo(id);
   }
 }

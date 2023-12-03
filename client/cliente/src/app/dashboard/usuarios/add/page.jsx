@@ -1,7 +1,6 @@
 "use client";
-import { create } from "domain";
 import { useRouter } from "next/navigation";
-import { createUser } from "../../../lib/actions";
+import { create } from "../../../lib/actions";
 import styles from "@/app/ui/dashboard/users/addUser/addUser.module.css";
 
 const AddUserPage = () => {
@@ -84,13 +83,13 @@ const AddUserPage = () => {
       permissao,
     };
 
-    const response = await createUser(user);
+    const response = await create(user, "/users");
     if (response) {
       alert("Usuário criado com sucesso!");
       router.push("/dashboard/usuarios");
       router.refresh();
     } else {
-      alert("Erro ao criar usuário!");
+      alert("Erro ao  usuário!");
     }
   };
 

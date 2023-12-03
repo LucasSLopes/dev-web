@@ -13,10 +13,10 @@ const getToken = async () => {
 const baseUrl = "http://localhost:3000";
 
 
-export const create = async (data, url) => {
+export const create = async (data, path) => {
     const token = await getToken();
     try {
-      const response = await fetch("http://localhost:3000/users", {
+      const response = await fetch(baseUrl+path, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -24,12 +24,14 @@ export const create = async (data, url) => {
         },
         body: JSON.stringify(data),
       });
-      if (!response.ok) {
-        return false;
+      if (response.ok) {
+        return true;
       }
+      console.log(response.status, response.body, response.ok);
 
     } catch (error) {}
-    return true;
+   
+    return false;
 }
 
 
@@ -68,7 +70,26 @@ export const deleteUser = async (data) => {
     throw new Error(`Erro ao fazer a requisição ${url}`);
   }
 
-  revalidatePath("/dashboard/users/add");
+  revalidatePath("/dashboard/users/");
+};
+
+export const deleteAtivo = async (data) => {
+  const id = Object.fromEntries(data).id;
+  console.log(id);
+  const url = `http://localhost:3000/ativos/${id}`;
+  console.log(url);
+  const token = await getToken();
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  console.log(response.statusText,response.status)
+
+  revalidatePath("/dashboard/ativos/");
 };
 
 

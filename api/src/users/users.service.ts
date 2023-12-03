@@ -108,6 +108,8 @@ export class UsersService {
   }
 
   async deleteUser(id: number): Promise<ResponseUserDto> {
+    const teste = id;
+    console.log(teste);
     const user = await this.getUserById(id);
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
