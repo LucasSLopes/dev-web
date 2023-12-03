@@ -1,66 +1,99 @@
 "use client";
-import { createUser } from "@/app/lib/actions";
+import { create } from "domain";
+import { useRouter } from "next/navigation";
+import { createUser } from "../../../lib/actions";
 import styles from "@/app/ui/dashboard/users/addUser/addUser.module.css";
 
-const clearError = (fieldName) => {
-  document.getElementById(`${fieldName}-error`).innerText = ""; // Limpa o texto de erro do campo especificado
-};
+const AddUserPage = () => {
+  const router = useRouter();
 
-const handleFieldClick = (fieldName) => {
-  clearError(fieldName); // Chama a função para limpar o texto de erro do campo
-};
+  const clearError = (fieldName) => {
+    document.getElementById(`${fieldName}-error`).innerText = ""; // Limpa o texto de erro do campo especificado
+  };
 
-const handleSubmit = async (event) => {
-  event.preventDefault();
+  const handleFieldClick = (fieldName) => {
+    clearError(fieldName); // Chama a função para limpar o texto de erro do campo
+  };
 
-  const matricula = event.target.matricula.value;
-  const nome = event.target.nome.value;
-  const email = event.target.email.value;
-  const telefone = event.target.telefone.value;
-  const cpf = event.target.cpf.value;
-  const rg = event.target.rg.value;
-  const senha = event.target.senha.value;
-  const permissao = event.target.permissao.value;
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  const regexNome = /^[a-zA-Z\s]*$/;
-  const regexMatricula = /^\d{6}$/;
-  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const matricula = event.target.matricula.value;
+    const nome = event.target.nome.value;
+    const email = event.target.email.value;
+    const telefone = event.target.telefone.value;
+    const cpf = event.target.cpf.value;
+    const senha = event.target.senha.value;
+    const permissao = event.target.permissao.value;
 
-  if (nome.length < 6 || !regexNome.test(nome)) {
-    let errorMessage = "";
+    const regexNome = /^[a-zA-Z\s]*$/;
+    const regexMatricula = /^\d{6}$/;
+    const regexTelefone = /^\d{11}$/;
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const regexCpf = /^\d{11}$/;
+    const regexSenha = /^(.){8,}$/;
 
-    if (nome.length < 6) {
-      errorMessage = "Nome deve ter no mínimo 6 caracteres.";
-    } else {
-      errorMessage = "Nome inválido! Use apenas letras e espaços.";
+    if (nome.length < 6 || !regexNome.test(nome)) {
+      let errorMessage = "";
+
+      if (nome.length < 6) {
+        errorMessage = "Nome deve ter no mínimo 6 caracteres.";
+      } else {
+        errorMessage = "Nome inválido! Use apenas letras e espaços.";
+      }
+
+      // Exibindo mensagem de erro
+      document.getElementById("nome-error").innerText = errorMessage;
+      return; // Impede o envio do formulário se o nome for inválido
+    }
+    if (!regexMatricula.test(matricula)) {
+      document.getElementById("matricula-error").innerText =
+        "A matrícula deve ter exatamente 6 números.";
+      return;
     }
 
-    // Exibindo mensagem de erro
-    document.getElementById("nome-error").innerText = errorMessage;
-    return; // Impede o envio do formulário se o nome for inválido
-  }
-  if (!regexMatricula.test(matricula)) {
-    document.getElementById("matricula-error").innerText =
-      "A matrícula deve ter exatamente 6 números.";
-    return;
-  }
+    if (!regexEmail.test(email)) {
+      document.getElementById("email-error").innerText =
+        "Insira um email válido.";
+      return;
+    }
 
-  console.log("Criando usuário...");
+    if (!regexTelefone.test(telefone)) {
+      document.getElementById("telefone-error").innerText =
+        "Insira um telefone válido.";
+      return;
+    }
+    if (!regexCpf.test(cpf)) {
+      document.getElementById("cpf-error").innerText = "Insira um CPF válido.";
+      return;
+    }
 
-  // cpf: event.target.cpf.value,
-  // telefone: event.target.telefone.value,
-  // email: event.target.email.value,
-  // permissao: event.target.permissao.value,
-  // senha: event.target.senha.value,
-};
+    if (!regexSenha.test(senha)) {
+      document.getElementById("senha-error").innerText =
+        "Insira uma senha com mais de 8 dígitos.";
+      return;
+    }
 
-const handleFormSubmit = (e) => {
-  e.preventDefault();
-  // Lógica de validação e exibição da mensagem de erro, se necessário
-  setError("Preencha este campo corretamente.");
-};
+    const user = {
+      matricula,
+      nome,
+      email,
+      telefone,
+      cpf,
+      senha,
+      permissao,
+    };
 
-const AddUserPage = () => {
+    const response = await createUser(user);
+    if (response) {
+      alert("Usuário criado com sucesso!");
+      router.push("/dashboard/usuarios");
+      router.refresh();
+    } else {
+      alert("Erro ao criar usuário!");
+    }
+  };
+
   return (
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -86,7 +119,7 @@ const AddUserPage = () => {
 
         <div>
           <input
-            type="email"
+            type="text"
             placeholder="email"
             name="email"
             onClick={() => handleFieldClick("email")}
@@ -116,16 +149,6 @@ const AddUserPage = () => {
 
         <div>
           <input
-            type="text"
-            placeholder="RG"
-            name="rg"
-            onClick={() => handleFieldClick("rg")}
-          />
-          <span id="rg-error" className={styles.error}></span>
-        </div>
-
-        <div>
-          <input
             type="password"
             placeholder="Senha"
             name="senha"
@@ -140,7 +163,6 @@ const AddUserPage = () => {
             <option value={"ADMINISTRADOR"}>ADMINISTRADOR</option>
           </select>
         </div>
-
         <button type="submit">Criar Usuário</button>
       </form>
     </div>

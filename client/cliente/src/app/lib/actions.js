@@ -10,15 +10,31 @@ const getToken = async () => {
   return token;
 };
 
+const baseUrl = "http://localhost:3000";
 
-export const createUser = async (data) => {
-    const user = Object.fromEntries(data);
-    console.log(user);
+
+export const create = async (data, url) => {
+    const token = await getToken();
+    try {
+      const response = await fetch("http://localhost:3000/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        return false;
+      }
+
+    } catch (error) {}
+    return true;
 }
 
 
-export const listarUsers = async () => {
-  const url = `http://localhost:3000/users`;
+export const getAll = async (path) => {
+  const url = baseUrl + path;
   const token = await getToken();
   const response = await fetch(url, {
     method: "GET",
@@ -52,7 +68,7 @@ export const deleteUser = async (data) => {
     throw new Error(`Erro ao fazer a requisição ${url}`);
   }
 
-  revalidatePath("/dashboard/users");
+  revalidatePath("/dashboard/users/add");
 };
 
 
