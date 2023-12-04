@@ -62,7 +62,9 @@ export class SolicitacoesService {
 
   async count(): Promise<number> {
     try {
-      return await this.solicitacaoRepository.count();
+      return await this.solicitacaoRepository.count({
+        where: { statusSolicitacao: StatusSolicitacao.PENDENTE },
+      });
     } catch (error) {
       throw new Error(`Erro ao contar solicitacoes: ${error.message}`);
     }
