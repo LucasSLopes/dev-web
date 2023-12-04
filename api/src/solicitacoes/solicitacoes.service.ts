@@ -4,13 +4,18 @@ import { Solicitacao } from './entities/solicitacao.entity';
 import { CreateSolicitacaoDto } from './dto/create-solicitacao.dto';
 import { UsersService } from 'src/users/users.service';
 import { AtivosService } from 'src/ativos/ativos.service';
+import { EmprestimosService } from 'src/emprestimos/emprestimos.service';
 import { StatusSolicitacao } from './enum/statusSolicitacao.enum';
 import { BadRequestException } from '@nestjs/common';
+import { forwardRef } from '@nestjs/common/utils';
 
 @Injectable()
 export class SolicitacoesService {
   @Inject(AtivosService)
   private ativosService: AtivosService;
+
+  @Inject(forwardRef(() => EmprestimosService))
+  private emprestimosService: EmprestimosService;
 
   @Inject(UsersService)
   private usersService: UsersService;
@@ -40,7 +45,9 @@ export class SolicitacoesService {
         await this.solicitacaoRepository.save(createdSolicitacao);
         return createdSolicitacao;
       } catch (error) {
-        throw new Error(`Erro ao criar solicitacao: ${error.message}`);
+        throw new BadRequestException(
+          `Erro ao criar solicitacao: ${error.message}`,
+        );
       }
     }
   }
@@ -61,11 +68,34 @@ export class SolicitacoesService {
     }
   }
 
-  async getSolicitacoesPendentes(): Promise<Solicitacao[]> {
+  async getSolicitacoesPendentes() {
     try {
-      return await this.solicitacaoRepository.find({
+      const solicitacoes = await this.solicitacaoRepository.find({
         where: { statusSolicitacao: StatusSolicitacao.PENDENTE },
       });
+      const ativos = [];
+      const usuarios = [];
+
+      for (let i = 0; i < solicitacoes.length; i++) {
+        ativos.push(
+          await this.ativosService.getAtivoById(solicitacoes[i].ativo),
+        );
+        usuarios.push(
+          await this.usersService.getUserById(solicitacoes[i].usuario),
+        );
+      }
+
+      const response = solicitacoes.map((solicitacao, index) => {
+        return {
+          id: solicitacao.id,
+          mensagem: solicitacao.descricao,
+          status: solicitacao.statusSolicitacao,
+          ativo: ativos[index],
+          usuario: usuarios[index],
+        };
+      });
+
+      return response;
     } catch (error) {
       throw new Error(
         `Erro ao buscar solicitacoes pendentes: ${error.message}`,
@@ -88,7 +118,7 @@ export class SolicitacoesService {
     }
   }
 
-  async getSolicitacaoPendenteById(id: number): Promise<Solicitacao> {
+  async getSolicitacaoPendenteById(id: number) {
     try {
       return await this.solicitacaoRepository.findOne({
         where: { id, statusSolicitacao: StatusSolicitacao.PENDENTE },
@@ -132,6 +162,23 @@ export class SolicitacoesService {
       return await this.solicitacaoRepository.save(solicitacao);
     } catch (error) {
       throw new Error(`Erro ao fechar solicitacao: ${error.message}`);
+    }
+  }
+
+  async aprovarSolicitacao(id: number) {
+    try {
+      const solicitacao = await this.getSolicitacaoPendenteById(id);
+      const ativo = await this.ativosService.getAtivoById(solicitacao.ativo);
+      const user = await this.usersService.getUserById(solicitacao.usuario);
+      const emprestimo = {
+        ativo: ativo.id,
+        usuario: user.id,
+        solicitacao: solicitacao.id,
+      };
+      await this.emprestimosService.criarEmprestimo(emprestimo);
+      return solicitacao;
+    } catch (error) {
+      throw new Error(`Erro ao aprovar solicitacao: ${error.message}`);
     }
   }
 }

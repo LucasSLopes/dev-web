@@ -6,9 +6,15 @@ import { emprestimoProvider } from './entities/emprestimo.provider';
 import { AtivosModule } from 'src/ativos/ativos.module';
 import { UsersModule } from 'src/users/users.module';
 import { SolicitacoesModule } from 'src/solicitacoes/solicitacoes.module';
+import { forwardRef } from '@nestjs/common/utils';
 
 @Module({
-  imports: [DatabaseModule, AtivosModule, UsersModule, SolicitacoesModule],
+  imports: [
+    DatabaseModule,
+    AtivosModule,
+    UsersModule,
+    forwardRef(() => SolicitacoesModule),
+  ],
   controllers: [EmprestimosController],
   providers: [...emprestimoProvider, EmprestimosService],
   exports: [EmprestimosService],

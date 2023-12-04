@@ -5,9 +5,6 @@ import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/route";
 
 import { deleteUser, getAll } from "@/app/lib/actions";
 
-
-
-
 const UsersPage = async () => {
   const user = await getAll("/users");
 
@@ -21,6 +18,7 @@ const UsersPage = async () => {
       <table className={styles.table}>
         <thead>
           <tr>
+            <td>ID</td>
             <td>Nome</td>
             <td>Email</td>
             <td>Telefone</td>
@@ -30,9 +28,8 @@ const UsersPage = async () => {
         <tbody>
           {user.map((user) => (
             <tr key={user.id}>
-              <td>
-                <span>{user.nome}</span>
-              </td>
+              <td>{user.id}</td>
+              <td>{user.nome}</td>
               <td>{user.email}</td>
               <td>{user.telefone}</td>
               <td>{user.permissao}</td>

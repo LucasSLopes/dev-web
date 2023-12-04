@@ -35,7 +35,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUserByMatricula(@Param('id') id: number) {
+  async getUserByid(@Param('id') id: number) {
+    console.log(id);
     return await this.usersService.getUserById(id);
   }
 

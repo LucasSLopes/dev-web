@@ -7,6 +7,7 @@ import { UsersService } from 'src/users/users.service';
 import { StatusEmprestimo } from './enum/statusEmprestimo.enum';
 import { SolicitacoesService } from 'src/solicitacoes/solicitacoes.service';
 import { Status } from 'src/ativos/enums/status.enum';
+import { forwardRef } from '@nestjs/common/utils';
 
 @Injectable()
 export class EmprestimosService {
@@ -14,7 +15,7 @@ export class EmprestimosService {
   private ativosService: AtivosService;
   @Inject(UsersService)
   private usersService: UsersService;
-  @Inject(SolicitacoesService)
+  @Inject(forwardRef(() => SolicitacoesService))
   private solicitacoesService: SolicitacoesService;
   constructor(
     @Inject('EMPRESTIMOS_RP')
@@ -47,13 +48,17 @@ export class EmprestimosService {
         const emprestimoCriado =
           await this.emprestimoRepository.save(createdEmprestimo);
         try {
-          this.solicitacoesService.fecharSolicitacao(emprestimoCriado.id);
+          console.log(emprestimo.solicitacao);
+          await this.solicitacoesService.fecharSolicitacao(
+            emprestimo.solicitacao,
+          );
         } catch (error) {
           throw new NotFoundException(
             `Erro ao fechar solicitacao: ${error.message}`,
           );
         }
         try {
+          console.log(emprestimo.ativo);
           await this.ativosService.updateAtivoStatus({
             id: emprestimo.ativo,
             status: Status.ALOCADO,
@@ -61,7 +66,7 @@ export class EmprestimosService {
         } catch (error) {
           new NotFoundException(`Erro ao fechar solicitacao: ${error.message}`);
         }
-        return createdEmprestimo;
+        return emprestimoCriado;
       } catch (error) {
         throw new NotFoundException(
           `Erro ao criar emprestimo: ${error.message}`,

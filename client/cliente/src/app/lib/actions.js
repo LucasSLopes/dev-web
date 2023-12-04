@@ -37,6 +37,7 @@ export const create = async (data, path) => {
 
 export const getAll = async (path) => {
   const url = baseUrl + path;
+  console.log(url);
   const token = await getToken();
   const response = await fetch(url, {
     method: "GET",
@@ -47,7 +48,7 @@ export const getAll = async (path) => {
   });
 
   if (!response.ok) {
-    throw new Error(`Erro ao listar usuários`);
+    throw new Error(`Erro ao listar ${url}`);
   }
 
   return response.json();
@@ -92,5 +93,55 @@ export const deleteAtivo = async (data) => {
   revalidatePath("/dashboard/ativos/");
 };
 
+export const aprovarSolicitacao = async (data) => {
+  const id = Object.fromEntries(data).id;
+  const url = `http://localhost:3000/solicitacoes/aprovar/${id}`;
+  console.log(url);
+  const token = await getToken();
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log(response.statusText,response.status)
+
+  revalidatePath("/dashboard/solicitacoes/");
+}
+
+export const negarSolicitacao = async (data) => {
+  const id = Object.fromEntries(data).id;
+  const url = `http://localhost:3000/solicitacoes/${id}`;
+  console.log(url);
+  const token = await getToken();
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log(response.statusText,response.status)
+
+  revalidatePath("/dashboard/solicitacoes/");
+}
 
 
+export const solicitarAtivo = async (data) => {
+  const solicitacao = Object.fromEntries(data);
+  const url = `http://localhost:3000/solicitacoes`;
+  console.log(solicitacao)
+  const token = await getToken();
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(solicitacao),
+  });
+  console.log(response.statusText,response.status, response.body)
+
+  revalidatePath("/dashboard/solicitacoes/");
+};

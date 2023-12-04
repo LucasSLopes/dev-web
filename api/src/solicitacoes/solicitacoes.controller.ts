@@ -13,11 +13,11 @@ export class SolicitacoesController {
     return this.solicitacaoService.criarSolicitacao(createSolicitacaoDto);
   }
   @Get()
-  async getAllSolicitacoes(): Promise<Solicitacao[]> {
+  async getAllSolicitacoes() {
     return this.solicitacaoService.getAllSolicitacoes();
   }
   @Get('/pendentes')
-  async getSolicitacoesPendentes(): Promise<Solicitacao[]> {
+  async getSolicitacoesPendentes() {
     return this.solicitacaoService.getSolicitacoesPendentes();
   }
   @Get('/usuario/:id')
@@ -40,5 +40,9 @@ export class SolicitacoesController {
   @Put(':id')
   async fecharSolicitacao(@Param('id') id: number): Promise<Solicitacao> {
     return this.solicitacaoService.fecharSolicitacao(id);
+  }
+  @Post('/aprovar/:id')
+  async aprovarSolicitacao(@Param('id') id: number) {
+    return this.solicitacaoService.aprovarSolicitacao(id);
   }
 }
