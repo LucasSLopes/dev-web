@@ -48,7 +48,6 @@ export class EmprestimosService {
         const emprestimoCriado =
           await this.emprestimoRepository.save(createdEmprestimo);
         try {
-          console.log(emprestimo.solicitacao);
           await this.solicitacoesService.fecharSolicitacao(
             emprestimo.solicitacao,
           );
@@ -58,7 +57,6 @@ export class EmprestimosService {
           );
         }
         try {
-          console.log(emprestimo.ativo);
           await this.ativosService.updateAtivoStatus({
             id: emprestimo.ativo,
             status: Status.ALOCADO,
@@ -83,11 +81,32 @@ export class EmprestimosService {
     }
   }
 
-  async getEmprestimosAtivos(): Promise<Emprestimo[]> {
+  async getEmprestimosAtivos() {
     try {
-      return await this.emprestimoRepository.find({
+      const emprestimos = await this.emprestimoRepository.find({
         where: { status_emprestimo: StatusEmprestimo.ATIVO },
       });
+
+      const ativos = [];
+      const usuarios = [];
+
+      for (let i = 0; i < emprestimos.length; i++) {
+        ativos.push(
+          await this.ativosService.getAtivoById(emprestimos[i].ativo),
+        );
+        usuarios.push(
+          await this.usersService.getUserById(emprestimos[i].usuario),
+        );
+      }
+      const response = emprestimos.map((emprestimo, index) => {
+        return {
+          id: emprestimo.id,
+          solicitacao: emprestimo.solicitacao,
+          ativo: ativos[index],
+          usuario: usuarios[index],
+        };
+      });
+      return response;
     } catch (error) {
       throw new Error(`Erro ao buscar emprestimos ativos: ${error.message}`);
     }
@@ -126,6 +145,7 @@ export class EmprestimosService {
   }
 
   async fecharEmprestimo(id: number): Promise<Emprestimo> {
+    console.log(id);
     try {
       const emprestimo = await this.emprestimoRepository.findOne({
         where: { id },
@@ -135,6 +155,10 @@ export class EmprestimosService {
       }
       emprestimo.status_emprestimo = StatusEmprestimo.FECHADO;
       emprestimo.data_devolucao = new Date();
+      await this.ativosService.updateAtivoStatus({
+        id: emprestimo.ativo,
+        status: Status.DISPONIVEL,
+      });
       return await this.emprestimoRepository.save(emprestimo);
     } catch (error) {
       throw new Error(`Erro ao fechar emprestimo: ${error.message}`);

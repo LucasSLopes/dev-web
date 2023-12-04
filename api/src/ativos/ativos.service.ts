@@ -20,7 +20,7 @@ export class AtivosService {
   async criarAtivo(createAtivoDto: CreateAtivoDto): Promise<Ativo> {
     const CGR = createAtivoDto.CGR;
     const cgrExiste = await this.ativoRepository.findOne({ where: { CGR } });
-
+    console.log(createAtivoDto);
     if (cgrExiste) {
       throw new NotFoundException('CGR já cadastrado');
     }
