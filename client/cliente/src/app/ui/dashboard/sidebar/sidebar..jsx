@@ -15,6 +15,7 @@ import styles from './sidebar.module.css';
 import jwt from "jsonwebtoken";
 import nextAuth, { getServerSession } from "next-auth";
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/route";
+import dynamic from "next/dynamic";
 
 const menuItems = [
   {
@@ -54,7 +55,7 @@ const Sidebar = async () => {
 
 const session = await getServerSession(nextAuthOptions);
 const decoded = jwt.decode(session.token);
-
+const LogoutButton = dynamic(() => import("./LogoutButton"), { ssr: false });
   return (
      
 
@@ -82,10 +83,7 @@ const decoded = jwt.decode(session.token);
           </li>
         ))}
       </ul>
-      <button className={styles.logout}>
-        <MdLogout />
-        Logout
-      </button>
+      <LogoutButton />
     </div>
   ); 
 };

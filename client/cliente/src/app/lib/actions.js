@@ -2,19 +2,36 @@
 import { revalidatePath } from "next/cache";
 import nextAuth, { getServerSession } from "next-auth";
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/dist/server/api-utils";
+import { redirect } from "next/navigation";
+import cookie from "cookie";
+import jwt from "jsonwebtoken";
+import { get } from "http";
 
-const getToken = async () => {
+
+export const getToken = async () => {
   const ServerSession = await getServerSession(nextAuthOptions);
   const token = ServerSession.token;
   return token;
 };
+
+export const getUserPermission = async () => {
+  const session = await getServerSession(nextAuthOptions);
+  if (!session){
+    redirect("/login");
+  }
+  const user = jwt.decode(session.token);
+  if (user.permissao !== "ADMINISTRADOR"){
+    console.log(user.permissao)
+    redirect("/dashboard");
+  }
+}
 
 const baseUrl = "http://localhost:3000";
 
 
 export const create = async (data, path) => {
     const token = await getToken();
+    console.log(data)
     try {
       const response = await fetch(baseUrl+path, {
         method: "POST",
@@ -78,7 +95,6 @@ export const deleteAtivo = async (data) => {
   const id = Object.fromEntries(data).id;
   console.log(id);
   const url = `http://localhost:3000/ativos/${id}`;
-  console.log(url);
   const token = await getToken();
   const response = await fetch(url, {
     method: "DELETE",
@@ -145,3 +161,18 @@ export const solicitarAtivo = async (data) => {
 
   revalidatePath("/dashboard/solicitacoes/");
 };
+
+export const fecharEmprestimo = async (data) => {
+  const emprestimo = Object.fromEntries(data);
+  const url = baseUrl + "/emprestimos/" + emprestimo.id;
+  const token = await getToken();
+  const response = await fetch(url, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log(response.statusText, response.status, response.body);
+  revalidatePath("/dashboard/emprestimos/");
+}
